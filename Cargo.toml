@@ -1,0 +1,17 @@
+[package]
+name = "irc_to_http"
+version = "0.1.0"
+authors = ["stubiklaus <tobias-heinrichs@t-online.de>"]
+
+[lib]
+name = "irc_to_http"
+
+[[bin]]
+name = "irc_to_http"
+doc = false
+
+
+[dependencies]
+loirc = "*"
+rand = "*"
+iron = "*"

@@ -4,7 +4,7 @@ pub mod irc_configuration;
 
 use std::sync::{Mutex, Arc};
 use std::thread;
-use loirc::Event;
+use loirc::{Event, Code};
 
 use self::connection::*;
 use self::irc_data_store::*;
@@ -31,6 +31,7 @@ impl IrcController{
     pub fn start_handling(self) -> Arc<IrcController>  {
         let arc = Arc::new(self);
         let arc_clone = arc.clone();
+        println!("Starting handling");
         thread::spawn( move || {
             loop{
                 arc_clone.handle_event(arc_clone.connection.get_message());
@@ -39,6 +40,27 @@ impl IrcController{
         arc
     }
     pub fn handle_event(&self, event: Event){
-        println!("{:?}",event);
+        let writer = self.connection.get_writer();
+        match event {
+            Event::Message(msg) => {
+                match msg.code {
+                    Code::Ping => {
+                        writer.raw(format!("PONG :{}\n",msg.args[0])).unwrap();
+                    },
+                    Code::RplWelcome => {
+                        self.connection.join_channel("dasimperium");
+                    },
+                    Code::Join => {
+                        let mut ds = self.datastore.lock().unwrap();
+                        ds.add_channel(msg.args[0].clone());
+                    },
+                    _ => {println!("{:?}",msg);}
+                }
+            },
+            _ => {
+                println!("{:?}",event);
+            }
+        }
     }
+
 }

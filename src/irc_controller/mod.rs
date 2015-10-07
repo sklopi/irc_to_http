@@ -54,6 +54,10 @@ impl IrcController{
                         let mut ds = self.datastore.lock().unwrap();
                         ds.add_channel(msg.args[0].clone());
                     },
+                    Code::Privmsg =>{
+                        self.connection.get_writer().raw(format!("PRIVMSG #dasimperium :Schnauze jetzt!\n"));
+                        println!("{:?}",msg);
+                    }
                     _ => {println!("{:?}",msg);}
                 }
             },
